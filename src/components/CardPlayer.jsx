@@ -1,49 +1,12 @@
 import { Strength } from "../assets/strength"
 import { Bag } from "../assets/bag"
 import { Level } from "../assets/level"
-import { useState } from "react"
-import { useEffect } from "react"
 import { Button } from "./Button"
+import { usePlayerStats } from "../hooks/usePlayerStats"
 
-export function CardPlayer({ player, onReset }) {
+export function CardPlayer({ player }) {
 
-    const [playerStats, setPlayerStats] = useState({ level: 1, equipment: 0 })
-
-    const handleChange = (type, e) => {
-        let value = e.target.value
-
-        if (type === 'level') {
-            value = value >= 1 ? value : 1
-            setPlayerStats(prev => ({ ...prev, level: Math.min(value, 10) }))
-        } else if (type === 'equipment') {
-            value = value >= 0 ? value : 1
-
-            setPlayerStats(prev => ({ ...prev, equipment: isNaN(parseInt(value)) ? 0 : Math.min(parseInt(value), 99) }))
-        }
-    }
-
-    const increasePoints = (type) => {
-        if (type === 'level') {
-            setPlayerStats(prev => ({ ...prev, level: Math.min(playerStats.level + 1, 10) }))
-        } else if (type === 'equipment') {
-            setPlayerStats(prev => ({ ...prev, equipment: playerStats.equipment + 1 }))
-        }
-    }
-
-    const decreasePoints = (type) => {
-        if (type === 'level') {
-            setPlayerStats(prev => ({ ...prev, level: Math.max(playerStats.level - 1, 1) }))
-        } else if (type === 'equipment') {
-            setPlayerStats(prev => ({ ...prev, equipment: Math.max(playerStats.equipment - 1, 0) }))
-        }
-    }
-
-    const strengthTotal = playerStats.level + playerStats.equipment
-    const strength = strengthTotal > 100 ? 100 : strengthTotal
-
-    useEffect(() => {
-        setPlayerStats(prev => ({ ...prev, level: 1, equipment: 0 }))
-    }, [onReset])
+    const { decreasePoints, increasePoints, playerStats, handleChange, strength, resetStats } = usePlayerStats()
 
 
     return (
@@ -51,7 +14,7 @@ export function CardPlayer({ player, onReset }) {
             <div className="relative flex justify-between items-center border border-black p-4">
                 <div>
                     <h2>{player.name}</h2>
-                    <small className={player.sex === 'fem' ? 'text-red-300' : 'text-blue-300'}>{player.sex}</small>
+                    <small className={player.sex === 'femenino' ? 'text-red-300' : 'text-blue-300'}>{player.sex === 'femenino' ? '♀️' : '♂️'}</small>
                 </div>
                 <aside className="flex gap-4 justify-center items-center">
                     <section className="flex flex-col items-center justify-center">
@@ -75,7 +38,7 @@ export function CardPlayer({ player, onReset }) {
                         {strength}
                     </section>
                 </aside>
-                <button className="absolute bottom-0.5 left-3 cursor-pointer text-xs text-red-400 border border-red-950 p-1 rounded-md hover:bg-red-900 hover:text-white transition-all duration-400" onClick={() => setPlayerStats(prev => ({ ...prev, 'level': 1, 'equipment': 0 }))}>KILL</button>
+                <button className="absolute top-0 bottom-0 left-0 right-0 m-auto cursor-pointer text-xs text-red-400 border border-red-950 p-1 rounded-md active:bg-red-900 hover:text-white transition-all duration-100 w-max h-max active:w-full active:h-full" onClick={() => resetStats()}>KILL</button>
             </div>
         </>
     )
